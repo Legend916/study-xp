@@ -1,0 +1,17 @@
+{
+  "name": "Study XP",
+  "short_name": "Study XP",
+  "description": "A school-first productivity app that turns real classes, assignments, and focus time into levels, streaks, and motivating quests.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07131d",
+  "theme_color": "#7ff0c8",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

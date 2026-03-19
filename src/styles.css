@@ -1,0 +1,522 @@
+:root {
+  color-scheme: dark;
+  --bg: #07131d;
+  --bg-2: #0d2132;
+  --panel: rgba(7, 19, 29, 0.78);
+  --panel-strong: rgba(10, 28, 44, 0.92);
+  --line: rgba(169, 214, 255, 0.12);
+  --text: #f1f7ff;
+  --muted: #9cb4c8;
+  --mint: #7ff0c8;
+  --blue: #7cb8ff;
+  --gold: #ffd37f;
+  --hot: #ff8f78;
+  --shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+  --radius-lg: 28px;
+  --radius-md: 22px;
+  --radius-sm: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(127, 240, 200, 0.15), transparent 25%),
+    radial-gradient(circle at 90% 0%, rgba(255, 211, 127, 0.12), transparent 18%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 52%, #050b11 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+strong {
+  font-family: "Rockwell", "Bookman Old Style", "Trebuchet MS", serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.screen-shell {
+  width: min(1280px, calc(100% - 24px));
+  margin: 0 auto;
+  padding: 20px 0 40px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  padding: 22px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--mint);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.panel-copy,
+.section-header p,
+.lede,
+.note,
+.hero-meta,
+.zone-card span,
+.zone-card small,
+.due-item span,
+.story-card p,
+.metric-card small,
+.metric-card span,
+.feature-card p,
+.timer-card span,
+.timer-card p,
+.best-next-card p,
+.character-card span {
+  color: var(--muted);
+}
+
+.auth-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  align-items: stretch;
+  min-height: calc(100vh - 60px);
+}
+
+.hero-copy {
+  padding: 40px 16px 20px 6px;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 7vw, 5.2rem);
+  line-height: 0.93;
+  max-width: 11ch;
+}
+
+.lede {
+  max-width: 58ch;
+  font-size: 1.04rem;
+  line-height: 1.7;
+  margin-top: 18px;
+}
+
+.auth-panel h2,
+.section-header h2,
+.hero-card h2 {
+  margin: 0;
+}
+
+.auth-form,
+.stack,
+.stats-stack,
+.skill-nodes,
+.due-list,
+.story-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form label,
+.card-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button.primary {
+  color: #072114;
+  background: linear-gradient(135deg, var(--mint), #bbffe0);
+}
+
+.button.secondary {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.button.ghost {
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.feature-strip,
+.rewards-row,
+.proof-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reward-chip,
+.proof-chip,
+.quest-tag,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.status-badge.saved {
+  background: rgba(127, 240, 200, 0.12);
+  color: var(--mint);
+}
+
+.status-badge.saving {
+  background: rgba(255, 211, 127, 0.14);
+  color: var(--gold);
+}
+
+.status-badge.error {
+  background: rgba(255, 143, 120, 0.14);
+  color: var(--hot);
+}
+
+.topbar,
+.section-header,
+.quest-line,
+.level-inline,
+.hero-character,
+.quest-metrics,
+.due-item,
+.skill-head,
+.topbar-actions,
+.toggle,
+.timer-card,
+.zone-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.accent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.topbar {
+  margin-bottom: 18px;
+}
+
+.toggle input {
+  width: auto;
+}
+
+.setup-grid,
+.dashboard-grid,
+.feature-grid,
+.skill-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.setup-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dashboard-grid {
+  grid-template-columns: 1.18fr 0.82fr;
+  margin-bottom: 18px;
+}
+
+.dashboard-grid.secondary,
+.dashboard-grid.tertiary {
+  grid-template-columns: 1fr 1fr;
+}
+
+.feature-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.skill-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-grid .wide {
+  grid-column: 1 / -1;
+}
+
+.avatar-preview,
+.avatar-badge {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #062130;
+  font-weight: 800;
+}
+
+.avatar-badge {
+  color: #072114;
+}
+
+.avatar-badge.large {
+  width: 88px;
+  height: 88px;
+  font-size: 1.3rem;
+}
+
+.hero-card,
+.onboarding-summary,
+.best-next-card,
+.timer-card,
+.feature-card,
+.zone-card,
+.skill-card,
+.story-card,
+.quest-card,
+.metric-card,
+.character-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.best-next-card,
+.timer-card,
+.zone-card,
+.skill-card,
+.story-card,
+.quest-card,
+.metric-card,
+.feature-card {
+  padding: 18px;
+}
+
+.metric-grid,
+.subject-progress-grid,
+.character-grid,
+.zone-grid,
+.quest-board {
+  display: grid;
+  gap: 14px;
+}
+
+.metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.subject-progress-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.character-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.zone-grid,
+.story-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quest-board {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.character-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  padding: 14px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.character-card.active {
+  border-color: rgba(127, 240, 200, 0.3);
+  background: rgba(127, 240, 200, 0.1);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mint), var(--gold));
+}
+
+.progress-bar.compact {
+  height: 10px;
+}
+
+.checkpoint-list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.quest-card.complete {
+  opacity: 0.68;
+}
+
+.quest-tag.daily,
+.quest-tag.routine,
+.quest-tag.upcoming {
+  color: var(--mint);
+}
+
+.quest-tag.boss,
+.quest-tag.due-soon {
+  color: var(--gold);
+}
+
+.quest-tag.rescue,
+.quest-tag.overdue {
+  color: var(--hot);
+}
+
+.quest-tag.story,
+.quest-tag.side,
+.quest-tag.legendary,
+.quest-tag.neutral,
+.quest-tag.complete {
+  color: var(--blue);
+}
+
+.skill-node {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.skill-node.unlocked {
+  border-color: rgba(127, 240, 200, 0.26);
+  background: rgba(127, 240, 200, 0.08);
+}
+
+.mode-select {
+  width: auto;
+}
+
+.app-loading {
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 1100px) {
+  .auth-hero,
+  .setup-grid,
+  .dashboard-grid,
+  .dashboard-grid.secondary,
+  .dashboard-grid.tertiary,
+  .feature-grid,
+  .skill-grid,
+  .quest-board,
+  .subject-progress-grid,
+  .zone-grid,
+  .story-grid,
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .screen-shell {
+    width: min(100% - 16px, 1280px);
+    padding-top: 14px;
+  }
+
+  .topbar,
+  .topbar-actions,
+  .hero-character,
+  .level-inline,
+  .quest-line,
+  .quest-metrics {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-grid,
+  .character-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row {
+    width: 100%;
+  }
+
+  .button-row .button {
+    flex: 1 1 100%;
+  }
+}

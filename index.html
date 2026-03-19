@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Study XP turns real classes, assignments, and focus time into a dopamine-friendly school dashboard with levels, streaks, and smart task planning."
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Study XP</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      if (window.location.protocol === "file:" && !window.location.pathname.replace(/\\/g, "/").includes("/dist/")) {
+        const distUrl = new URL("./dist/index.html", window.location.href);
+        window.location.replace(distUrl.href);
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
