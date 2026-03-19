@@ -8,7 +8,7 @@ Study XP is a school-first web app that turns real classes, assignments, and foc
 - Turns classes and assignments into daily quests and higher-stakes study sessions
 - Rewards progress with XP, levels, streaks, combo bonuses, and skill unlocks
 - Includes Pomodoro mode, catch-up paths, and low-energy task recovery
-- Saves locally by default and supports Firebase-based cloud sync when configured
+- Saves locally by default and supports Google sign-in plus Firebase-based cloud sync when configured
 
 ## Local development
 
@@ -29,7 +29,7 @@ The production bundle is written to `dist/`. This project uses a single-file Vit
 
 ## Firebase setup
 
-Cloud sign-in and sync are optional. To enable them, copy `.env.example` into a local env file and fill in your Firebase values:
+Google sign-in and cloud sync are optional. To enable them, copy `.env.example` into a local env file and fill in your Firebase values:
 
 ```bash
 VITE_FIREBASE_API_KEY=
@@ -40,7 +40,7 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-If these values are missing, the app still works in local-only mode.
+If these values are missing, the app still works in local-only mode and Google sign-in will stay unavailable on that deployment.
 
 ## Cloudflare Pages deployment
 

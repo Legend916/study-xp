@@ -2,14 +2,9 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import "./styles.css";
 import {
-  clearFirebaseConfig,
-  getFirebaseConfigDraft,
-  getFirebaseConfigSource,
   hasFirebaseConfig,
   loadCloudData,
   saveCloudData,
-  saveFirebaseConfig,
-  signInEmail,
   signInGoogle,
   signOutCloud
 } from "./lib/firebase";
@@ -47,7 +42,6 @@ import type {
   StudentProfileDraft,
   SubjectPath
 } from "./types/game";
-import type { FirebaseClientConfig, FirebaseConfigSource } from "./lib/firebase";
 
 type TimerState = {
   questId: string;
@@ -63,11 +57,7 @@ function App() {
   const [profileDraft, setProfileDraft] = useState<StudentProfileDraft>(() => initialData.profile ? toProfileDraft(initialData.profile) : createBlankProfileDraft());
   const [classDrafts, setClassDrafts] = useState<ClassDraft[]>(() => initialData.classes.length ? initialData.classes.map(toClassDraft) : [createBlankClassDraft()]);
   const [assignmentDrafts, setAssignmentDrafts] = useState<AssignmentDraft[]>(() => initialData.assignments.length ? initialData.assignments.map(toAssignmentDraft) : [createBlankAssignmentDraft()]);
-  const [authForm, setAuthForm] = useState({ displayName: "", email: "", password: "" });
-  const [firebaseConfigDraft, setFirebaseConfigDraft] = useState<FirebaseClientConfig>(() => getFirebaseConfigDraft());
-  const [firebaseConfigSource, setFirebaseConfigSource] = useState<FirebaseConfigSource>(() => getFirebaseConfigSource());
-  const [firebaseReady, setFirebaseReady] = useState(() => hasFirebaseConfig());
-  const [showCloudSetup, setShowCloudSetup] = useState(() => !hasFirebaseConfig());
+  const [authForm, setAuthForm] = useState({ displayName: "" });
   const [statusMessage, setStatusMessage] = useState("Set up your real classes and let the app turn them into a motivating school dashboard.");
   const [syncState, setSyncState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [privateMode, setPrivateMode] = useState(false);
@@ -138,67 +128,20 @@ function App() {
     setAssignmentDrafts(source.assignments.length ? source.assignments.map(toAssignmentDraft) : [createBlankAssignmentDraft(source.classes[0]?.id ?? "")]);
   }
 
-  function refreshFirebaseSetupState() {
-    setFirebaseConfigDraft(getFirebaseConfigDraft());
-    setFirebaseConfigSource(getFirebaseConfigSource());
-    setFirebaseReady(hasFirebaseConfig());
-  }
-
-  function handleSaveCloudSetup(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    try {
-      saveFirebaseConfig(firebaseConfigDraft);
-      refreshFirebaseSetupState();
-      setShowCloudSetup(false);
-      setStatusMessage("Cloud sync is configured on this device. Email and Google sign-in are now ready.");
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : "Cloud setup could not be saved.");
-    }
-  }
-
-  function handleClearCloudSetup() {
-    clearFirebaseConfig();
-    refreshFirebaseSetupState();
-    setShowCloudSetup(true);
-    setStatusMessage("Saved Firebase setup was removed from this browser. Local mode still works.");
-  }
-
   function handleLocalStart(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const displayName = authForm.displayName.trim() || authForm.email.trim().split("@")[0] || "Student";
+    const displayName = authForm.displayName.trim() || "Student";
     const session: SessionState = {
       mode: "local",
       userId: `local-${createId("user")}`,
       displayName,
-      email: authForm.email.trim() || "local@studyxp.app",
+      email: "local@studyxp.app",
       cloudEnabled: false,
       lastSyncedAt: null
     };
 
     setData((current) => ({ ...(current.profile || current.classes.length ? current : createEmptyAppData(session)), session }));
-    setStatusMessage("Local profile ready. Progress will stay on this device until cloud sync is configured.");
-  }
-
-  async function handleCloudEmail(createAccount: boolean) {
-    try {
-      const credentials = await signInEmail(authForm.email.trim(), authForm.password, createAccount);
-      const session: SessionState = {
-        mode: "firebase",
-        userId: credentials.user.uid,
-        displayName: credentials.user.displayName || authForm.displayName || credentials.user.email?.split("@")[0] || "Student",
-        email: credentials.user.email || authForm.email.trim(),
-        cloudEnabled: true,
-        lastSyncedAt: null
-      };
-      const cloudData = await loadCloudData(credentials.user.uid);
-      const nextData = cloudData ? { ...cloudData, session } : createEmptyAppData(session);
-      setData(nextData);
-      restoreDraftsFromData(nextData);
-      setStatusMessage(createAccount ? "Cloud account created. Progress will sync across devices." : "Cloud account loaded from Firebase.");
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : "Cloud sign-in failed.");
-    }
+    setStatusMessage("Local profile ready. Progress will stay on this device until you sign in with Google.");
   }
 
   async function handleGoogleAuth() {
@@ -223,7 +166,7 @@ function App() {
   }
 
   async function handleSignOut() {
-    if (data.session?.mode === "firebase" && hasFirebaseConfig()) {
+    if (data.session?.mode === "firebase" && hasFirebaseConfig) {
       try {
         await signOutCloud();
       } catch {
@@ -312,82 +255,15 @@ function App() {
                 <span>Display name</span>
                 <input value={authForm.displayName} onChange={(event) => setAuthForm((current) => ({ ...current, displayName: event.target.value }))} placeholder="Ava Martinez" />
               </label>
-              <label>
-                <span>Email</span>
-                <input type="email" value={authForm.email} onChange={(event) => setAuthForm((current) => ({ ...current, email: event.target.value }))} placeholder="student@email.com" />
-              </label>
-              <label>
-                <span>Password</span>
-                <input type="password" value={authForm.password} onChange={(event) => setAuthForm((current) => ({ ...current, password: event.target.value }))} placeholder="For cloud sign-in" />
-              </label>
               <div className="button-row">
                 <button className="button primary" type="submit">Continue in local mode</button>
-                <button className="button secondary" type="button" disabled={!firebaseReady} onClick={() => void handleCloudEmail(false)}>Cloud sign in</button>
-                <button className="button secondary" type="button" disabled={!firebaseReady} onClick={() => void handleCloudEmail(true)}>Create cloud account</button>
-                <button className="button ghost" type="button" disabled={!firebaseReady} onClick={() => void handleGoogleAuth()}>Google</button>
+                <button className="button secondary" type="button" onClick={() => void handleGoogleAuth()}>Continue with Google</button>
               </div>
             </form>
-            <div className="button-row auth-tools">
-              <button className="button ghost" type="button" onClick={() => setShowCloudSetup((current) => !current)}>
-                {showCloudSetup ? "Hide cloud setup" : firebaseReady ? "Edit cloud setup" : "Set up cloud sync"}
-              </button>
-              {firebaseConfigSource === "browser" && (
-                <button className="button ghost" type="button" onClick={handleClearCloudSetup}>
-                  Clear saved setup
-                </button>
-              )}
-            </div>
-            {showCloudSetup && (
-              <form className="panel config-panel" onSubmit={handleSaveCloudSetup}>
-                <SectionHeader
-                  title="Cloud Setup"
-                  subtitle="Paste your Firebase web app keys here. This is the public client config Firebase expects in browser apps."
-                />
-                <div className="card-grid config-grid">
-                  <label className="wide">
-                    <span>API key</span>
-                    <input value={firebaseConfigDraft.apiKey} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "apiKey", event.target.value)} placeholder="AIza..." />
-                  </label>
-                  <label>
-                    <span>Auth domain</span>
-                    <input value={firebaseConfigDraft.authDomain} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "authDomain", event.target.value)} placeholder="your-app.firebaseapp.com" />
-                  </label>
-                  <label>
-                    <span>Project ID</span>
-                    <input value={firebaseConfigDraft.projectId} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "projectId", event.target.value)} placeholder="your-project-id" />
-                  </label>
-                  <label>
-                    <span>Storage bucket</span>
-                    <input value={firebaseConfigDraft.storageBucket} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "storageBucket", event.target.value)} placeholder="your-app.firebasestorage.app" />
-                  </label>
-                  <label>
-                    <span>Messaging sender ID</span>
-                    <input value={firebaseConfigDraft.messagingSenderId} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "messagingSenderId", event.target.value)} placeholder="1234567890" />
-                  </label>
-                  <label>
-                    <span>App ID</span>
-                    <input value={firebaseConfigDraft.appId} onChange={(event) => updateFirebaseConfigDraft(setFirebaseConfigDraft, "appId", event.target.value)} placeholder="1:1234567890:web:abcdef" />
-                  </label>
-                </div>
-                <div className="button-row">
-                  <button className="button primary" type="submit">Save cloud setup</button>
-                  {firebaseConfigSource === "browser" && (
-                    <button className="button secondary" type="button" onClick={handleClearCloudSetup}>
-                      Remove saved keys
-                    </button>
-                  )}
-                </div>
-                <p className="note">
-                  If you want Google sign-in to work, add `study-xp.pages.dev` and any custom domain to Firebase Auth authorized domains.
-                </p>
-              </form>
-            )}
             <p className="note">
-              {firebaseReady
-                ? firebaseConfigSource === "env"
-                  ? "Cloud sync is configured for this site, so email and Google auth can sync progress to Firestore."
-                  : "Cloud sync is configured in this browser, so email and Google auth are ready on this device."
-                : "Cloud sync is not set up yet. Add your Firebase web app keys below once, then the cloud login buttons will turn on."}
+              {hasFirebaseConfig
+                ? "Google sign-in can sync progress across devices on this deployment."
+                : "Google sign-in needs Firebase connected on this deployment."}
             </p>
           </div>
         </section>
@@ -833,14 +709,6 @@ function FeaturePill({ text }: { text: string }) {
 function updateProfileDraft(
   setDraft: Dispatch<SetStateAction<StudentProfileDraft>>,
   field: keyof StudentProfileDraft,
-  value: string
-) {
-  setDraft((current) => ({ ...current, [field]: value }));
-}
-
-function updateFirebaseConfigDraft(
-  setDraft: Dispatch<SetStateAction<FirebaseClientConfig>>,
-  field: keyof FirebaseClientConfig,
   value: string
 ) {
   setDraft((current) => ({ ...current, [field]: value }));
