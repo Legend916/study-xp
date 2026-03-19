@@ -42,18 +42,6 @@ VITE_FIREBASE_APP_ID=
 
 If these values are missing, the app still works in local-only mode.
 
-## GitHub Pages deployment
-
-This repo includes a GitHub Actions workflow at `.github/workflows/deploy-pages.yml`.
-
-After pushing the repo to GitHub:
-
-1. Open the repository settings.
-2. In `Pages`, set the source to `GitHub Actions`.
-3. Push to `main` or run the workflow manually.
-
-If you want cloud sync in production, add the same `VITE_FIREBASE_*` values as GitHub Actions repository secrets.
-
 ## Cloudflare Pages deployment
 
 This project also supports Cloudflare Pages with Wrangler.
@@ -65,3 +53,7 @@ npm run deploy:cloudflare
 ```
 
 The deploy command publishes `dist/` to a Cloudflare Pages project named `study-xp`.
+
+Current public site:
+
+- `https://study-xp.pages.dev`
