@@ -102,7 +102,7 @@ function App() {
         await applyGoogleSession(data, credentials);
       } catch (error) {
         if (!cancelled) {
-          setStatusMessage(error instanceof Error ? error.message : "Google sign-in failed.");
+          setStatusMessage(getAuthMessage(error));
         }
       }
     };
@@ -124,8 +124,13 @@ function App() {
       try {
         await saveCloudData(data.session!.userId, data);
         setSyncState("saved");
-      } catch {
+      } catch (error) {
         setSyncState("error");
+        setData((current) => current.session?.cloudEnabled
+          ? { ...current, session: { ...current.session, cloudEnabled: false } }
+          : current
+        );
+        setStatusMessage(getCloudSetupMessage(error));
       }
     }, 900);
 
@@ -188,19 +193,32 @@ function App() {
       lastSyncedAt: null
     };
 
-    const cloudData = await loadCloudData(credentials.user.uid);
-    const localStarter = hasTrackedProgress(sourceData) ? { ...sourceData, session } : createEmptyAppData(session);
-    const nextData = cloudData ? { ...cloudData, session } : localStarter;
+    try {
+      const cloudData = await loadCloudData(credentials.user.uid);
+      const localStarter = hasTrackedProgress(sourceData) ? { ...sourceData, session } : createEmptyAppData(session);
+      const nextData = cloudData ? { ...cloudData, session } : localStarter;
 
-    setData(nextData);
-    restoreDraftsFromData(nextData);
-    setStatusMessage(
-      cloudData
-        ? "Google login connected. Your cloud save is loaded."
-        : hasTrackedProgress(sourceData)
-          ? "Google login connected. Your current progress is now syncing."
-          : "Google login connected. Cloud save is now active."
-    );
+      setData(nextData);
+      restoreDraftsFromData(nextData);
+      setStatusMessage(
+        cloudData
+          ? "Google login connected. Your cloud save is loaded."
+          : hasTrackedProgress(sourceData)
+            ? "Google login connected. Your current progress is now syncing."
+            : "Google login connected. Cloud save is now active."
+      );
+      setSyncState("idle");
+    } catch (error) {
+      const localSession: SessionState = { ...session, cloudEnabled: false };
+      const fallbackData = hasTrackedProgress(sourceData)
+        ? { ...sourceData, session: localSession }
+        : createEmptyAppData(localSession);
+
+      setData(fallbackData);
+      restoreDraftsFromData(fallbackData);
+      setSyncState("error");
+      setStatusMessage(getCloudSetupMessage(error));
+    }
   }
 
   async function handleGoogleAuth() {
@@ -215,7 +233,7 @@ function App() {
 
       await applyGoogleSession(data, credentials);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : "Google sign-in failed.");
+      setStatusMessage(getAuthMessage(error));
     } finally {
       setAuthBusy(false);
     }
@@ -826,6 +844,46 @@ function hasTrackedProgress(data: AppData) {
     data.quests.length ||
     data.milestones.length
   );
+}
+
+function getAuthMessage(error: unknown) {
+  const code = getFirebaseErrorCode(error);
+
+  if (code === "auth/unauthorized-domain") {
+    return "Google sign-in is blocked until study-xp.pages.dev is added to Firebase authorized domains.";
+  }
+
+  if (code === "auth/operation-not-allowed") {
+    return "Google sign-in is not turned on in Firebase yet.";
+  }
+
+  if (code === "auth/popup-closed-by-user") {
+    return "Google sign-in was canceled before it finished.";
+  }
+
+  return error instanceof Error ? error.message : "Google sign-in failed.";
+}
+
+function getCloudSetupMessage(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("missing or insufficient permissions")) {
+    return "Google sign-in worked, but Firestore permissions are not ready yet. Your progress is still saved on this device.";
+  }
+
+  if (message.includes("cloud firestore api has not been used") || message.includes("service_disabled")) {
+    return "Google sign-in worked, but Firestore is not turned on yet. Your progress is still saved on this device.";
+  }
+
+  if (message.includes("permission-denied")) {
+    return "Google sign-in worked, but cloud save is blocked right now. Your progress is still saved on this device.";
+  }
+
+  return "Google sign-in worked, but cloud save is not ready yet. Your progress is still saved on this device.";
+}
+
+function getFirebaseErrorCode(error: unknown) {
+  return typeof error === "object" && error && "code" in error ? String(error.code) : "";
 }
 
 function getBestNextQuest(quests: GeneratedQuest[], mode: "Chill" | "Competitive" | "Exam Week") {
