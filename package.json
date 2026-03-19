@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:cloudflare": "wrangler pages deploy dist --project-name study-xp"
   },
   "dependencies": {
     "firebase": "^11.6.1",
@@ -19,6 +20,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
-    "vite-plugin-singlefile": "^2.3.2"
+    "vite-plugin-singlefile": "^2.3.2",
+    "wrangler": "^4.9.1"
   }
 }

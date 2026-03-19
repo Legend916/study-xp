@@ -53,3 +53,15 @@ After pushing the repo to GitHub:
 3. Push to `main` or run the workflow manually.
 
 If you want cloud sync in production, add the same `VITE_FIREBASE_*` values as GitHub Actions repository secrets.
+
+## Cloudflare Pages deployment
+
+This project also supports Cloudflare Pages with Wrangler.
+
+```bash
+npm install
+npm run build
+npm run deploy:cloudflare
+```
+
+The deploy command publishes `dist/` to a Cloudflare Pages project named `study-xp`.
