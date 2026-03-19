@@ -40,6 +40,12 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
+Then in Firebase Console:
+
+- enable `Authentication > Sign-in method > Google`
+- add `study-xp.pages.dev` and any custom domain under `Authentication > Settings > Authorized domains`
+- create a Firestore database for the `studyXpAppState` collection used by the app
+
 If these values are missing, the app still works in local-only mode and Google sign-in will stay unavailable on that deployment.
 
 ## Cloudflare Pages deployment

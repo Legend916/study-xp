@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import "./styles.css";
 import {
+  completeGoogleRedirect,
   hasFirebaseConfig,
   loadCloudData,
   saveCloudData,
@@ -64,6 +65,7 @@ function App() {
   const [playMode, setPlayMode] = useState<"Chill" | "Competitive" | "Exam Week">("Chill");
   const [timer, setTimer] = useState<TimerState | null>(null);
   const [pomodoroBonusReady, setPomodoroBonusReady] = useState(false);
+  const [authBusy, setAuthBusy] = useState(false);
 
   const profile = data.profile;
   const bestNextQuest = useMemo(() => getBestNextQuest(data.quests, playMode), [data.quests, playMode]);
@@ -82,6 +84,35 @@ function App() {
   useEffect(() => {
     saveLocalData(data);
   }, [data]);
+
+  useEffect(() => {
+    if (!hasFirebaseConfig) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const finishRedirect = async () => {
+      try {
+        const credentials = await completeGoogleRedirect();
+        if (!credentials || cancelled) {
+          return;
+        }
+
+        await applyGoogleSession(data, credentials);
+      } catch (error) {
+        if (!cancelled) {
+          setStatusMessage(error instanceof Error ? error.message : "Google sign-in failed.");
+        }
+      }
+    };
+
+    void finishRedirect();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!data.session?.cloudEnabled) {
@@ -144,24 +175,49 @@ function App() {
     setStatusMessage("Local profile ready. Progress will stay on this device until you sign in with Google.");
   }
 
+  async function applyGoogleSession(
+    sourceData: AppData,
+    credentials: { user: { uid: string; displayName: string | null; email: string | null } }
+  ) {
+    const session: SessionState = {
+      mode: "firebase",
+      userId: credentials.user.uid,
+      displayName: credentials.user.displayName || credentials.user.email?.split("@")[0] || sourceData.profile?.name || "Student",
+      email: credentials.user.email || "student@studyxp.app",
+      cloudEnabled: true,
+      lastSyncedAt: null
+    };
+
+    const cloudData = await loadCloudData(credentials.user.uid);
+    const localStarter = hasTrackedProgress(sourceData) ? { ...sourceData, session } : createEmptyAppData(session);
+    const nextData = cloudData ? { ...cloudData, session } : localStarter;
+
+    setData(nextData);
+    restoreDraftsFromData(nextData);
+    setStatusMessage(
+      cloudData
+        ? "Google login connected. Your cloud save is loaded."
+        : hasTrackedProgress(sourceData)
+          ? "Google login connected. Your current progress is now syncing."
+          : "Google login connected. Cloud save is now active."
+    );
+  }
+
   async function handleGoogleAuth() {
+    setAuthBusy(true);
+
     try {
       const credentials = await signInGoogle();
-      const session: SessionState = {
-        mode: "firebase",
-        userId: credentials.user.uid,
-        displayName: credentials.user.displayName || credentials.user.email?.split("@")[0] || "Student",
-        email: credentials.user.email || "student@studyxp.app",
-        cloudEnabled: true,
-        lastSyncedAt: null
-      };
-      const cloudData = await loadCloudData(credentials.user.uid);
-      const nextData = cloudData ? { ...cloudData, session } : createEmptyAppData(session);
-      setData(nextData);
-      restoreDraftsFromData(nextData);
-      setStatusMessage("Google login connected. Cloud save is now active.");
+      if (!credentials) {
+        setStatusMessage("Redirecting to Google sign-in...");
+        return;
+      }
+
+      await applyGoogleSession(data, credentials);
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "Google sign-in failed.");
+    } finally {
+      setAuthBusy(false);
     }
   }
 
@@ -257,7 +313,9 @@ function App() {
               </label>
               <div className="button-row">
                 <button className="button primary" type="submit">Continue in local mode</button>
-                <button className="button secondary" type="button" onClick={() => void handleGoogleAuth()}>Continue with Google</button>
+                <button className="button secondary" type="button" onClick={() => void handleGoogleAuth()} disabled={authBusy}>
+                  {authBusy ? "Connecting..." : "Continue with Google"}
+                </button>
               </div>
             </form>
             <p className="note">
@@ -281,6 +339,11 @@ function App() {
           </div>
           <div className="topbar-actions">
             <span className="status-badge">{data.session.cloudEnabled ? "Cloud ready" : "Local only"}</span>
+            {data.session.mode === "local" && hasFirebaseConfig && (
+              <button className="button secondary" onClick={() => void handleGoogleAuth()} disabled={authBusy}>
+                {authBusy ? "Connecting..." : "Connect Google"}
+              </button>
+            )}
             <button className="button ghost" onClick={() => void handleSignOut()}>Sign out</button>
           </div>
         </header>
@@ -423,6 +486,11 @@ function App() {
             <option>Exam Week</option>
           </select>
           <span className={`status-badge ${syncState}`}>{data.session.cloudEnabled ? `Cloud ${syncState}` : "Local save"}</span>
+          {data.session.mode === "local" && hasFirebaseConfig && (
+            <button className="button secondary" onClick={() => void handleGoogleAuth()} disabled={authBusy}>
+              {authBusy ? "Connecting..." : "Connect Google"}
+            </button>
+          )}
           <button className="button ghost" onClick={handleReopenSetup}>Edit setup</button>
           <button className="button ghost" onClick={() => void handleSignOut()}>Sign out</button>
         </div>
@@ -747,6 +815,17 @@ function toClassDraft(course: ClassCourse): ClassDraft {
 
 function toAssignmentDraft(assignment: Assignment): AssignmentDraft {
   return { id: assignment.id, classId: assignment.classId, title: assignment.title, type: assignment.type, dueDate: assignment.dueDate, estimatedMinutes: assignment.estimatedMinutes, status: assignment.status };
+}
+
+function hasTrackedProgress(data: AppData) {
+  return Boolean(
+    data.onboardingComplete ||
+    data.profile ||
+    data.classes.length ||
+    data.assignments.length ||
+    data.quests.length ||
+    data.milestones.length
+  );
 }
 
 function getBestNextQuest(quests: GeneratedQuest[], mode: "Chill" | "Competitive" | "Exam Week") {
