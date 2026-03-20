@@ -20,6 +20,7 @@ import {
   createEmptyAppData,
   createId,
   formatDueLabel,
+  formatSubjectLabel,
   generateWorkspace,
   getAvatarTheme,
   getRankTitle,
@@ -52,6 +53,7 @@ type TimerState = {
 };
 
 const initialData = loadLocalData() ?? createEmptyAppData(null);
+const courseSubjects = subjectPaths.filter((subject) => subject !== "Study Habits");
 
 function App() {
   const [data, setData] = useState<AppData>(initialData);
@@ -59,7 +61,7 @@ function App() {
   const [classDrafts, setClassDrafts] = useState<ClassDraft[]>(() => initialData.classes.length ? initialData.classes.map(toClassDraft) : [createBlankClassDraft()]);
   const [assignmentDrafts, setAssignmentDrafts] = useState<AssignmentDraft[]>(() => initialData.assignments.length ? initialData.assignments.map(toAssignmentDraft) : [createBlankAssignmentDraft()]);
   const [authForm, setAuthForm] = useState({ displayName: "" });
-  const [statusMessage, setStatusMessage] = useState("Set up your real classes and let the app turn them into a motivating school dashboard.");
+  const [statusMessage, setStatusMessage] = useState("Set up your real courses and let the app turn them into a motivating academic dashboard.");
   const [syncState, setSyncState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [privateMode, setPrivateMode] = useState(false);
   const [playMode, setPlayMode] = useState<"Chill" | "Competitive" | "Exam Week">("Chill");
@@ -73,6 +75,7 @@ function App() {
     () => [...data.assignments].filter((assignment) => assignment.status !== "complete").sort((left, right) => left.dueDate.localeCompare(right.dueDate)).slice(0, 5),
     [data.assignments]
   );
+  const trackedSubjects = useMemo(() => getTrackedSubjects(data.classes), [data.classes]);
   const semesterProgress = useMemo(() => {
     if (!data.milestones.length) {
       return 0;
@@ -255,13 +258,13 @@ function App() {
   function handleGenerateWorkspace() {
     const next = generateWorkspace(data.session, profileDraft, classDrafts, assignmentDrafts);
     setData(next);
-    setStatusMessage("Your real schedule is now mapped into XP, focus blocks, and recovery paths.");
+    setStatusMessage("Your real course load is now mapped into XP, focus blocks, and recovery paths.");
   }
 
   function handleReopenSetup() {
     restoreDraftsFromData(data);
     setData((current) => ({ ...current, onboardingComplete: false }));
-    setStatusMessage("Setup reopened. You can adjust your profile, classes, and assignments without losing the account shell.");
+    setStatusMessage("Setup reopened. You can adjust your profile, courses, and assignments without losing the account shell.");
   }
 
   function handleCompleteQuest(questId: string) {
@@ -274,7 +277,7 @@ function App() {
         next.profile.level = progressToNextLevel(next.profile.totalXp).level;
         next.profile.rankTitle = getRankTitle(next.profile.level);
         next.profile.skillTrees = buildSkillTrees(next.profile.subjectXp);
-        next.profile.masteryScore = Math.round(Object.values(next.profile.subjectXp).reduce((sum, value) => sum + value, 0) / subjectPaths.length);
+        next.profile.masteryScore = averageTrackedSubjectXp(next.profile.subjectXp);
         next = { ...next, profile: { ...next.profile }, comboCount: Math.min(5, next.comboCount + 1) };
       }
 
@@ -309,12 +312,12 @@ function App() {
         <section className="auth-hero">
           <div className="hero-copy">
             <p className="eyebrow">Study XP</p>
-            <h1>Make real schoolwork feel rewarding without pretending it is fantasy.</h1>
+            <h1>Make real coursework feel rewarding without pretending it is fantasy.</h1>
             <p className="lede">
-              Study XP is a school-first dashboard that turns real classes, assignments, and focus time into levels, streaks, XP, and clear next steps.
+              Study XP is an academic dashboard that turns real courses, labs, assignments, and focus time into levels, streaks, XP, and clear next steps.
             </p>
             <div className="feature-strip">
-              <FeaturePill text="Real classes" />
+              <FeaturePill text="Courses and labs" />
               <FeaturePill text="XP and streaks" />
               <FeaturePill text="Focus tools" />
               <FeaturePill text="Cloud-ready sync" />
@@ -353,7 +356,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">Setup</p>
-            <h1>Build your real school dashboard</h1>
+            <h1>Build your academic dashboard</h1>
           </div>
           <div className="topbar-actions">
             <span className="status-badge">{data.session.cloudEnabled ? "Cloud ready" : "Local only"}</span>
@@ -368,7 +371,7 @@ function App() {
 
         <section className="setup-grid">
           <div className="panel">
-            <SectionHeader title="Student Profile" subtitle="One real student profile built for school." />
+            <SectionHeader title="Academic Profile" subtitle="One real student profile built for college courses, labs, studios, and seminars." />
             <div className="stack">
               <div className="card-grid">
                 <div className="avatar-preview" style={{ background: getAvatarTheme(profileDraft.avatarTheme).background }}>
@@ -379,12 +382,12 @@ function App() {
                   <input value={profileDraft.name} onChange={(event) => updateProfileDraft(setProfileDraft, "name", event.target.value)} placeholder="Ava Martinez" />
                 </label>
                 <label>
-                  <span>Grade level</span>
-                  <input value={profileDraft.gradeLevel} onChange={(event) => updateProfileDraft(setProfileDraft, "gradeLevel", event.target.value)} placeholder="8th Grade" />
+                  <span>Year or program</span>
+                  <input value={profileDraft.gradeLevel} onChange={(event) => updateProfileDraft(setProfileDraft, "gradeLevel", event.target.value)} placeholder="College sophomore" />
                 </label>
                 <label className="wide">
                   <span>Goal</span>
-                  <input value={profileDraft.goal} onChange={(event) => updateProfileDraft(setProfileDraft, "goal", event.target.value)} placeholder="Raise algebra scores and stay consistent after school." />
+                  <input value={profileDraft.goal} onChange={(event) => updateProfileDraft(setProfileDraft, "goal", event.target.value)} placeholder="Stay ahead in organic chemistry and finish seminar papers earlier." />
                 </label>
                 <label className="wide">
                   <span>Avatar theme</span>
@@ -397,36 +400,55 @@ function App() {
           </div>
 
           <div className="panel">
-            <SectionHeader title="My Classes" subtitle="Classes stay real. The app adds structure, urgency, and rewards." />
+            <SectionHeader title="My Courses" subtitle="Courses stay real. The app adds structure, urgency, and rewards around the work you actually have." />
             <div className="stack">
               {classDrafts.map((draft) => (
                 <div className="card-grid" key={draft.id}>
                   <label>
-                    <span>Class name</span>
-                    <input value={draft.name} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "name", event.target.value)} placeholder="Algebra I" />
+                    <span>Course name</span>
+                    <input value={draft.name} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "name", event.target.value)} placeholder="Organic Chemistry" />
                   </label>
                   <label>
                     <span>Subject</span>
                     <select value={draft.subject} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "subject", event.target.value as SubjectPath)}>
-                      {subjectPaths.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
+                      {courseSubjects.map((subject) => (
+                        <option key={subject} value={subject}>
+                          {subject === "Other" ? "Other / custom" : formatSubjectLabel(subject)}
+                        </option>
+                      ))}
                     </select>
                   </label>
+                  <div className="button-row wide">
+                    <button className="button ghost" type="button" onClick={() => updateClassDraft(setClassDrafts, draft.id, "subject", "Other")}>
+                      Other subject
+                    </button>
+                  </div>
+                  {draft.subject === "Other" && (
+                    <label className="wide">
+                      <span>Custom subject</span>
+                      <input
+                        value={draft.subjectLabel}
+                        onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "subjectLabel", event.target.value)}
+                        placeholder="Astronomy, Architecture, Anthropology..."
+                      />
+                    </label>
+                  )}
                   <label>
-                    <span>Teacher</span>
-                    <input value={draft.teacher} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "teacher", event.target.value)} placeholder="Mr. Carter" />
+                    <span>Instructor</span>
+                    <input value={draft.teacher} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "teacher", event.target.value)} placeholder="Professor Nguyen" />
                   </label>
                   <label>
                     <span>Meeting pattern</span>
-                    <input value={draft.meetingPattern} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "meetingPattern", event.target.value)} placeholder="Mon / Wed / Fri" />
+                    <input value={draft.meetingPattern} onChange={(event) => updateClassDraft(setClassDrafts, draft.id, "meetingPattern", event.target.value)} placeholder="Tue / Thu lecture" />
                   </label>
                 </div>
               ))}
             </div>
-            <button className="button secondary" onClick={() => setClassDrafts((current) => [...current, createBlankClassDraft()])}>Add class</button>
+            <button className="button secondary" onClick={() => setClassDrafts((current) => [...current, createBlankClassDraft()])}>Add course</button>
           </div>
 
           <div className="panel">
-            <SectionHeader title="Assignments" subtitle="Homework becomes daily quests. Tests and projects become higher-stakes missions." />
+            <SectionHeader title="Assignments" subtitle="Coursework, labs, readings, and exams become focused quests with better pacing." />
             <div className="stack">
               {assignmentDrafts.map((draft) => (
                 <div className="card-grid" key={draft.id}>
@@ -435,10 +457,10 @@ function App() {
                     <input value={draft.title} onChange={(event) => updateAssignmentDraft(setAssignmentDrafts, draft.id, "title", event.target.value)} placeholder="Chapter 4 problem set" />
                   </label>
                   <label>
-                    <span>Class</span>
+                    <span>Course</span>
                     <select value={draft.classId} onChange={(event) => updateAssignmentDraft(setAssignmentDrafts, draft.id, "classId", event.target.value)}>
-                      <option value="">Choose class</option>
-                      {classDrafts.map((item) => <option key={item.id} value={item.id}>{item.name || "Untitled class"}</option>)}
+                      <option value="">Choose course</option>
+                      {classDrafts.map((item) => <option key={item.id} value={item.id}>{item.name || "Untitled course"}</option>)}
                     </select>
                   </label>
                   <label>
@@ -468,11 +490,11 @@ function App() {
         </section>
 
         <section className="panel onboarding-summary">
-          <SectionHeader title="What Gets Generated Automatically" subtitle="Everything stays grounded in real schoolwork while still feeling rewarding." />
+          <SectionHeader title="What Gets Generated Automatically" subtitle="Everything stays grounded in real coursework while still feeling rewarding." />
           <div className="feature-grid">
-            <FeatureCard title="Quest engine" text="Assignments turn into daily tasks, test prep sessions, focus blocks, and catch-up missions." />
-            <FeatureCard title="Skill tracking" text="Math, Reading, Science, Writing, and Study Habits each get their own XP and unlocks." />
-            <FeatureCard title="Class dashboards" text="Every class keeps its real teacher and meeting pattern while showing where effort pays off." />
+            <FeatureCard title="Quest engine" text="Assignments, lab prep, readings, and exam review turn into focused tasks, study blocks, and catch-up paths." />
+            <FeatureCard title="Skill tracking" text="Every course area you actually study gets its own XP lane, unlocks, and stat growth." />
+            <FeatureCard title="Course dashboards" text="Every course keeps its real instructor and meeting pattern while showing where effort pays off." />
             <FeatureCard title="Focus support" text="Pomodoro mode, streak shields, combo bonuses, and low-energy recovery paths are built in." />
           </div>
           <div className="button-row">
@@ -490,7 +512,7 @@ function App() {
       <header className="topbar">
         <div>
           <p className="eyebrow">Study XP Dashboard</p>
-          <h1>{profile ? `${profile.name}'s school dashboard` : "School dashboard"}</h1>
+          <h1>{profile ? `${profile.name}'s academic dashboard` : "Academic dashboard"}</h1>
           <p className="panel-copy">{statusMessage}</p>
         </div>
         <div className="topbar-actions">
@@ -519,7 +541,7 @@ function App() {
           <div className="hero-character">
             {profile && <AvatarBadge profile={profile} large />}
             <div>
-              <p className="eyebrow">Student Profile</p>
+              <p className="eyebrow">Academic Profile</p>
               <h2>{profile?.name}</h2>
               <p className="hero-meta">{profile?.gradeLevel} / Level {profile?.level} / {profile?.rankTitle}</p>
               <p className="panel-copy">{profile?.goal}</p>
@@ -578,12 +600,12 @@ function App() {
 
       <section className="dashboard-grid secondary">
         <article className="panel">
-          <SectionHeader title="Subject XP" subtitle="See exactly where your progress is coming from." />
+          <SectionHeader title="Subject XP" subtitle="Track the course areas that matter this semester." />
           {profile && (
             <div className="subject-progress-grid">
-              {subjectPaths.map((subject) => (
+              {trackedSubjects.map((subject) => (
                 <div className="metric-card" key={subject}>
-                  <span>{subject}</span>
+                  <span>{getSubjectDisplayName(subject, data.classes)}</span>
                   <strong>{privateMode ? "Hidden" : `${profile.subjectXp[subject]} XP`}</strong>
                   <div className="progress-bar compact">
                     <span style={{ width: `${Math.min(100, (profile.subjectXp[subject] / 480) * 100)}%` }} />
@@ -611,12 +633,12 @@ function App() {
 
       <section className="dashboard-grid tertiary">
         <article className="panel">
-          <SectionHeader title="Classes" subtitle="Real classes, teachers, and meeting patterns with clear reward focus." />
+          <SectionHeader title="Courses" subtitle="Real courses, instructors, and meeting patterns with clear reward focus." />
           <div className="zone-grid">
             {data.classes.map((course) => (
               <div className="zone-card" key={course.id} style={{ borderColor: `${course.accent}55` }}>
                 <div className="quest-line">
-                  <span className="quest-tag neutral">{course.subject}</span>
+                  <span className="quest-tag neutral">{course.subjectLabel}</span>
                   <span className="accent-dot" style={{ background: course.accent }} />
                 </div>
                 <h3>{course.name}</h3>
@@ -679,13 +701,13 @@ function App() {
 
       <section className="dashboard-grid tertiary">
         <article className="panel">
-          <SectionHeader title="Skill Trees" subtitle="Each subject has a separate progression line tied to real work." />
+          <SectionHeader title="Skill Trees" subtitle="Each tracked subject has its own progression line tied to real work." />
           {profile && (
             <div className="skill-grid">
-              {subjectPaths.map((subject) => (
+              {trackedSubjects.map((subject) => (
                 <div className="skill-card" key={subject}>
                   <div className="skill-head">
-                    <strong>{subject}</strong>
+                    <strong>{getSubjectDisplayName(subject, data.classes)}</strong>
                     <span>{profile.subjectXp[subject]} XP</span>
                   </div>
                   <div className="skill-nodes">
@@ -828,7 +850,14 @@ function toProfileDraft(profile: StudentProfile): StudentProfileDraft {
 }
 
 function toClassDraft(course: ClassCourse): ClassDraft {
-  return { id: course.id, name: course.name, subject: course.subject, teacher: course.teacher, meetingPattern: course.meetingPattern };
+  return {
+    id: course.id,
+    name: course.name,
+    subject: course.subject,
+    subjectLabel: course.subjectLabel,
+    teacher: course.teacher,
+    meetingPattern: course.meetingPattern
+  };
 }
 
 function toAssignmentDraft(assignment: Assignment): AssignmentDraft {
@@ -938,6 +967,49 @@ function initialsFor(value: string) {
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function averageTrackedSubjectXp(subjectXp: StudentProfile["subjectXp"]) {
+  const trackedValues = Object.values(subjectXp).filter((value) => value > 0);
+
+  if (!trackedValues.length) {
+    return 0;
+  }
+
+  return Math.round(trackedValues.reduce((sum, value) => sum + value, 0) / trackedValues.length);
+}
+
+function getTrackedSubjects(classes: ClassCourse[]) {
+  const tracked = new Set<SubjectPath>(["Study Habits"]);
+
+  for (const course of classes) {
+    tracked.add(course.subject);
+  }
+
+  return [...tracked];
+}
+
+function getSubjectDisplayName(subject: SubjectPath, classes: ClassCourse[]) {
+  if (subject !== "Other") {
+    return subject;
+  }
+
+  const customLabels = [...new Set(
+    classes
+      .filter((course) => course.subject === "Other")
+      .map((course) => course.subjectLabel.trim())
+      .filter(Boolean)
+  )];
+
+  if (!customLabels.length) {
+    return "Other";
+  }
+
+  if (customLabels.length === 1) {
+    return customLabels[0];
+  }
+
+  return "Custom subjects";
 }
 
 export default App;

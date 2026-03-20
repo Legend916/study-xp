@@ -17,7 +17,43 @@ import type {
   SubjectPath
 } from "../types/game";
 
-export const subjectPaths: SubjectPath[] = ["Math", "Reading", "Science", "Writing", "Study Habits"];
+export const subjectPaths: SubjectPath[] = [
+  "Math",
+  "Statistics",
+  "Biology",
+  "Chemistry",
+  "Physics",
+  "Environmental Science",
+  "Geology",
+  "Computer Science",
+  "Data Science",
+  "Engineering",
+  "Nursing",
+  "Public Health",
+  "History",
+  "Political Science",
+  "Economics",
+  "Business",
+  "Accounting",
+  "Marketing",
+  "Psychology",
+  "Sociology",
+  "Anthropology",
+  "Philosophy",
+  "Law",
+  "Education",
+  "Reading",
+  "Literature",
+  "Writing",
+  "Language",
+  "Communications",
+  "Media Studies",
+  "Research",
+  "Art & Design",
+  "Music",
+  "Study Habits",
+  "Other"
+];
 
 export const avatarThemes = [
   { id: "aurora", name: "Aurora Mint", background: "linear-gradient(135deg, #7ff0c8 0%, #7cb8ff 100%)" },
@@ -33,28 +69,178 @@ const subjectBlueprints: Record<
 > = {
   Math: {
     focusArea: "memory",
-    studyStyle: "problem-solving repetitions and accuracy reps",
+    studyStyle: "problem sets, worked examples, and proof review",
     accent: "#7cb8ff"
+  },
+  Statistics: {
+    focusArea: "memory",
+    studyStyle: "data interpretation, problem sets, and concept review",
+    accent: "#8db7ff"
+  },
+  Biology: {
+    focusArea: "memory",
+    studyStyle: "lab notes, diagrams, and concept mapping",
+    accent: "#90d97a"
+  },
+  Chemistry: {
+    focusArea: "speed",
+    studyStyle: "equation practice, reaction review, and lab prep",
+    accent: "#73f1cd"
+  },
+  Physics: {
+    focusArea: "speed",
+    studyStyle: "derivations, formula reps, and problem solving",
+    accent: "#8ab8ff"
+  },
+  "Environmental Science": {
+    focusArea: "memory",
+    studyStyle: "case studies, field notes, and systems review",
+    accent: "#7fdf9f"
+  },
+  Geology: {
+    focusArea: "memory",
+    studyStyle: "lab samples, diagrams, and process review",
+    accent: "#b8c58b"
+  },
+  "Computer Science": {
+    focusArea: "speed",
+    studyStyle: "coding reps, debugging blocks, and build checkpoints",
+    accent: "#5fd3ff"
+  },
+  "Data Science": {
+    focusArea: "speed",
+    studyStyle: "analysis reps, notebook review, and model iteration",
+    accent: "#78d8ff"
+  },
+  Engineering: {
+    focusArea: "consistency",
+    studyStyle: "design reviews, calculations, and project milestones",
+    accent: "#9ad0ff"
+  },
+  Nursing: {
+    focusArea: "consistency",
+    studyStyle: "care plans, clinical prep, and applied review",
+    accent: "#80e2d4"
+  },
+  "Public Health": {
+    focusArea: "focus",
+    studyStyle: "case review, research reading, and synthesis",
+    accent: "#8ce0cf"
+  },
+  History: {
+    focusArea: "memory",
+    studyStyle: "source reading, timelines, and essay prep",
+    accent: "#f3c46d"
+  },
+  "Political Science": {
+    focusArea: "focus",
+    studyStyle: "reading blocks, argument mapping, and discussion prep",
+    accent: "#ffd37f"
+  },
+  Economics: {
+    focusArea: "memory",
+    studyStyle: "graph review, concept drills, and problem sets",
+    accent: "#f0c06b"
+  },
+  Business: {
+    focusArea: "consistency",
+    studyStyle: "case analysis, presentation prep, and planning blocks",
+    accent: "#e7bc78"
+  },
+  Accounting: {
+    focusArea: "consistency",
+    studyStyle: "ledger drills, problem sets, and exam review",
+    accent: "#f0c991"
+  },
+  Marketing: {
+    focusArea: "focus",
+    studyStyle: "campaign planning, case analysis, and presentation prep",
+    accent: "#ffc589"
+  },
+  Psychology: {
+    focusArea: "memory",
+    studyStyle: "study review, research recall, and applied examples",
+    accent: "#ffb086"
+  },
+  Sociology: {
+    focusArea: "focus",
+    studyStyle: "reading blocks, theory notes, and response writing",
+    accent: "#ffb993"
+  },
+  Anthropology: {
+    focusArea: "focus",
+    studyStyle: "field notes, reading review, and response writing",
+    accent: "#ffc8a7"
+  },
+  Philosophy: {
+    focusArea: "focus",
+    studyStyle: "close reading, argument breakdowns, and reflections",
+    accent: "#dcb8ff"
+  },
+  Law: {
+    focusArea: "focus",
+    studyStyle: "case briefing, close reading, and argument prep",
+    accent: "#d4b0ff"
+  },
+  Education: {
+    focusArea: "consistency",
+    studyStyle: "lesson planning, observation notes, and reflection work",
+    accent: "#ffd79f"
   },
   Reading: {
     focusArea: "focus",
     studyStyle: "annotation blocks and comprehension review",
     accent: "#ffd37f"
   },
-  Science: {
-    focusArea: "speed",
-    studyStyle: "lab review, concept checks, and test prep",
-    accent: "#7ff0c8"
+  Literature: {
+    focusArea: "focus",
+    studyStyle: "close reading, annotations, and discussion notes",
+    accent: "#ffd37f"
   },
   Writing: {
     focusArea: "focus",
-    studyStyle: "drafting sprints and revision passes",
+    studyStyle: "drafting sprints, revision passes, and workshop prep",
     accent: "#ff9f7f"
+  },
+  Language: {
+    focusArea: "consistency",
+    studyStyle: "vocabulary reps, speaking practice, and review drills",
+    accent: "#8de7c6"
+  },
+  "Art & Design": {
+    focusArea: "focus",
+    studyStyle: "studio blocks, critique prep, and iteration cycles",
+    accent: "#ff9fc6"
+  },
+  Music: {
+    focusArea: "consistency",
+    studyStyle: "practice sets, listening review, and performance prep",
+    accent: "#9fc5ff"
+  },
+  Communications: {
+    focusArea: "focus",
+    studyStyle: "presentation rehearsal, speaking drills, and outline work",
+    accent: "#ffd790"
+  },
+  "Media Studies": {
+    focusArea: "focus",
+    studyStyle: "screening review, analysis notes, and discussion prep",
+    accent: "#ffb8d2"
+  },
+  Research: {
+    focusArea: "consistency",
+    studyStyle: "source gathering, note synthesis, and writing passes",
+    accent: "#b4bfff"
   },
   "Study Habits": {
     focusArea: "consistency",
     studyStyle: "routine building and recovery systems",
     accent: "#d6a2ff"
+  },
+  Other: {
+    focusArea: "consistency",
+    studyStyle: "custom review blocks, check-ins, and steady progress",
+    accent: "#9fb8cf"
   }
 };
 
@@ -67,34 +253,6 @@ const rankLadder = [
   { level: 20, title: "Peak Semester" }
 ];
 
-const skillBlueprints: Record<SubjectPath, Array<{ id: string; name: string; tier: number; bonus: string; description: string }>> = {
-  Math: [
-    { id: "math-1", name: "Pattern Recall", tier: 1, bonus: "+Memory", description: "Makes repeated problem types feel easier to spot." },
-    { id: "math-2", name: "Fast Setup", tier: 2, bonus: "+Combo XP", description: "Clearing related math work in a row feels more rewarding." },
-    { id: "math-3", name: "Exam Calm", tier: 3, bonus: "+Test Prep", description: "Higher-stakes math review sessions feel easier to enter." }
-  ],
-  Reading: [
-    { id: "reading-1", name: "Annotation Flow", tier: 1, bonus: "+Focus", description: "Reading blocks hold attention longer." },
-    { id: "reading-2", name: "Recall Hooks", tier: 2, bonus: "+Summary XP", description: "Notes and summaries pay off faster." },
-    { id: "reading-3", name: "Deep Retention", tier: 3, bonus: "+Memory", description: "Reading review converts into long-term recall more efficiently." }
-  ],
-  Science: [
-    { id: "science-1", name: "Lab Tempo", tier: 1, bonus: "+Speed", description: "Science work starts faster and stays moving." },
-    { id: "science-2", name: "Concept Chain", tier: 2, bonus: "+Boss Prep", description: "Quiz and test prep sessions feel less heavy." },
-    { id: "science-3", name: "Data Clarity", tier: 3, bonus: "+Analysis XP", description: "Projects and reports reward more science mastery." }
-  ],
-  Writing: [
-    { id: "writing-1", name: "Draft Engine", tier: 1, bonus: "+Sprint XP", description: "Short writing sessions feel easier to begin." },
-    { id: "writing-2", name: "Revision Armor", tier: 2, bonus: "+Consistency", description: "Rewrites and edits are easier to keep steady." },
-    { id: "writing-3", name: "Final Push", tier: 3, bonus: "+Milestone XP", description: "Essays and major writing tasks scale better." }
-  ],
-  "Study Habits": [
-    { id: "study-1", name: "Morning Start", tier: 1, bonus: "+Start Boost", description: "Starting early feels less expensive." },
-    { id: "study-2", name: "Streak Guard", tier: 2, bonus: "+Streak Protect", description: "Off days are easier to recover from." },
-    { id: "study-3", name: "Focus Loop", tier: 3, bonus: "+Pomodoro XP", description: "Full focus blocks give stronger bonus XP." }
-  ]
-};
-
 const dailyModifiers = [
   "Low-pressure mode: short wins pay extra XP today.",
   "Combo boost: three completed tasks in one sitting earn bonus momentum.",
@@ -102,6 +260,81 @@ const dailyModifiers = [
   "Recovery window: overdue tasks are easier to bounce back from today.",
   "Pomodoro bonus: full focus blocks reward extra study habit XP."
 ];
+
+export function formatSubjectLabel(subject: SubjectPath, customLabel = "") {
+  return subject === "Other" ? customLabel.trim() || "Other" : subject;
+}
+
+function activeSubjectPaths(subjects: SubjectPath[]) {
+  const active = new Set<SubjectPath>(["Study Habits"]);
+
+  for (const subject of subjects) {
+    active.add(subject);
+  }
+
+  return [...active];
+}
+
+function skillBonusForFocusArea(focusArea: keyof StatBlock) {
+  if (focusArea === "memory") {
+    return "+Memory";
+  }
+
+  if (focusArea === "speed") {
+    return "+Speed";
+  }
+
+  if (focusArea === "focus") {
+    return "+Focus";
+  }
+
+  return "+Consistency";
+}
+
+function skillBlueprintsFor(subject: SubjectPath) {
+  const subjectId = subject.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const blueprint = subjectBlueprints[subject];
+
+  if (subject === "Study Habits") {
+    return [
+      { id: `${subjectId}-1`, name: "Routine Lock", tier: 1, bonus: "+Consistency", description: "Makes it easier to start and protect your study rhythm." },
+      { id: `${subjectId}-2`, name: "Streak Guard", tier: 2, bonus: "+Streak Protect", description: "Off days are easier to recover from without losing momentum." },
+      { id: `${subjectId}-3`, name: "Focus Loop", tier: 3, bonus: "+Pomodoro XP", description: "Full focus blocks turn into stronger habit and recovery gains." }
+    ];
+  }
+
+  if (subject === "Other") {
+    return [
+      { id: `${subjectId}-1`, name: "Custom Foundation", tier: 1, bonus: "+Consistency", description: "Creates a stable routine for courses that do not fit a standard bucket." },
+      { id: `${subjectId}-2`, name: "Flexible Flow", tier: 2, bonus: "+Combo XP", description: "Helps mixed workloads feel easier to plan and clear in one sitting." },
+      { id: `${subjectId}-3`, name: "Finish Strong", tier: 3, bonus: "+Milestone XP", description: "Makes independent or custom academic work easier to close out." }
+    ];
+  }
+
+  return [
+    {
+      id: `${subjectId}-1`,
+      name: `${subject} Foundations`,
+      tier: 1,
+      bonus: skillBonusForFocusArea(blueprint.focusArea),
+      description: `Makes ${subject.toLowerCase()} sessions easier to start and organize.`
+    },
+    {
+      id: `${subjectId}-2`,
+      name: `${subject} Flow`,
+      tier: 2,
+      bonus: "+Combo XP",
+      description: `Longer ${subject.toLowerCase()} blocks feel smoother and more consistent.`
+    },
+    {
+      id: `${subjectId}-3`,
+      name: `${subject} Finish`,
+      tier: 3,
+      bonus: "+Milestone XP",
+      description: `Big ${subject.toLowerCase()} deadlines feel easier to close out with ${blueprint.studyStyle}.`
+    }
+  ];
+}
 
 export function createId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`;
@@ -129,6 +362,7 @@ export function createBlankClassDraft(): ClassDraft {
     id: createId("class"),
     name: "",
     subject: "Math",
+    subjectLabel: "",
     teacher: "",
     meetingPattern: "Weekdays"
   };
@@ -174,7 +408,9 @@ export function generateWorkspace(
   const assignments = assignmentDrafts
     .filter((item) => item.title.trim() && item.classId)
     .map((item) => buildAssignment(item, classes));
-  const profile = profileDraft.name.trim() && profileDraft.gradeLevel.trim() ? buildProfile(profileDraft) : null;
+  const profile = profileDraft.name.trim() && profileDraft.gradeLevel.trim()
+    ? buildProfile(profileDraft, classes.map((item) => item.subject))
+    : null;
 
   return {
     session,
@@ -196,6 +432,7 @@ export function buildClassCourse(draft: ClassDraft): ClassCourse {
 
   return {
     ...draft,
+    subjectLabel: formatSubjectLabel(draft.subject, draft.subjectLabel),
     focusArea: blueprint.focusArea,
     studyStyle: blueprint.studyStyle,
     accent: blueprint.accent
@@ -213,9 +450,14 @@ export function buildAssignment(draft: AssignmentDraft, classes: ClassCourse[]):
   };
 }
 
-export function buildProfile(draft: StudentProfileDraft): StudentProfile {
+export function buildProfile(draft: StudentProfileDraft, subjects: SubjectPath[] = []): StudentProfile {
+  const seededSubjects = activeSubjectPaths(subjects);
   const subjectXp = subjectPaths.reduce<Record<SubjectPath, number>>((accumulator, subject) => {
-    accumulator[subject] = subject === "Study Habits" ? 60 : 40;
+    accumulator[subject] = subject === "Study Habits"
+      ? 60
+      : seededSubjects.includes(subject)
+        ? 40
+        : 0;
     return accumulator;
   }, {} as Record<SubjectPath, number>);
   const totalXp = Object.values(subjectXp).reduce((sum, value) => sum + value, 0);
@@ -242,7 +484,7 @@ export function buildProfile(draft: StudentProfileDraft): StudentProfile {
 
 export function buildSkillTrees(subjectXp: Record<SubjectPath, number>) {
   return subjectPaths.reduce<Record<SubjectPath, SkillNode[]>>((accumulator, subject) => {
-    accumulator[subject] = skillBlueprints[subject].map((node) => ({
+    accumulator[subject] = skillBlueprintsFor(subject).map((node) => ({
       ...node,
       unlocked: subjectXp[subject] >= node.tier * 120
     }));
@@ -259,6 +501,7 @@ export function buildQuests(classes: ClassCourse[], assignments: Assignment[]): 
     subtitle: `${course.teacher} / ${course.meetingPattern}`,
     type: "routine" as const,
     subject: course.subject,
+    subjectLabel: course.subjectLabel,
     className: course.name,
     teacherName: course.teacher,
     dueDate: todayIso(),
@@ -278,6 +521,7 @@ export function buildQuests(classes: ClassCourse[], assignments: Assignment[]): 
     subtitle: "A short task path for days when energy is low but momentum matters.",
     type: "stealth",
     subject: "Study Habits",
+    subjectLabel: "Study Habits",
     className: "Personal",
     teacherName: "Self-managed",
     dueDate: todayIso(),
@@ -301,6 +545,7 @@ export function buildQuests(classes: ClassCourse[], assignments: Assignment[]): 
         subtitle: `Recover ${overdue.length} overdue task${overdue.length === 1 ? "" : "s"} before they pile higher.`,
         type: "rescue",
         subject: "Study Habits",
+        subjectLabel: "Study Habits",
         className: "Catch-Up",
         teacherName: "Self-managed",
         dueDate: overdue[0].dueDate,
@@ -333,8 +578,8 @@ export function buildMilestones(classes: ClassCourse[], assignments: Assignment[
     {
       id: createId("milestone"),
       label: "Setup",
-      title: "School setup complete",
-      summary: "Tracks whether your real classes and workload are fully represented in the app.",
+      title: "Academic setup complete",
+      summary: "Tracks whether your real courses and workload are fully represented in the app.",
       progress: Math.min(100, classes.length * 20 + assignments.length * 10),
       reward: "Cleaner priorities and better quest generation"
     },
@@ -349,8 +594,8 @@ export function buildMilestones(classes: ClassCourse[], assignments: Assignment[
     {
       id: createId("milestone"),
       label: "Big Work",
-      title: "Tests and major projects",
-      summary: "Shows how your heavier assignments are progressing through the semester.",
+      title: "Exams and major projects",
+      summary: "Shows how your heavier deadlines are progressing through the semester.",
       progress: majorAssignments.length ? majorCompletionRate : Math.min(100, classes.length * 12),
       reward: "Eligible for a new-term boost"
     }
@@ -514,6 +759,7 @@ function assignmentToQuest(assignment: Assignment, classes: ClassCourse[]): Gene
     subtitle: `${classCourse?.name ?? "Independent Study"} / ${classCourse?.teacher ?? "Self-managed"}`,
     type,
     subject,
+    subjectLabel: classCourse?.subjectLabel ?? formatSubjectLabel(subject),
     className: classCourse?.name ?? "Independent Study",
     teacherName: classCourse?.teacher ?? "Self-managed",
     dueDate: assignment.dueDate,
@@ -565,17 +811,12 @@ function buildProof(type: AssignmentType) {
 function buildStatRewards(subject: SubjectPath, questType: GeneratedQuest["type"]): Partial<StatBlock> {
   const base: Partial<StatBlock> = {};
 
-  if (subject === "Math") {
-    base.memory = questType === "boss" ? 2 : 1;
-  } else if (subject === "Reading") {
-    base.focus = questType === "legendary" ? 2 : 1;
-  } else if (subject === "Science") {
-    base.speed = questType === "boss" ? 2 : 1;
-  } else if (subject === "Writing") {
-    base.focus = 1;
-    base.consistency = 1;
-  } else {
-    base.consistency = questType === "routine" ? 2 : 1;
+  const focusArea = subjectBlueprints[subject].focusArea;
+  const rewardAmount = questType === "boss" || questType === "legendary" ? 2 : 1;
+  base[focusArea] = rewardAmount;
+
+  if (subject === "Writing" || subject === "Research" || subject === "Other") {
+    base.consistency = Math.max(base.consistency ?? 0, 1);
   }
 
   return base;
@@ -629,7 +870,13 @@ function deriveAssignmentStatus(dueDate: string, currentStatus: AssignmentStatus
 }
 
 function calculateMasteryScore(subjectXp: Record<SubjectPath, number>) {
-  return Math.round(Object.values(subjectXp).reduce((sum, value) => sum + value, 0) / subjectPaths.length);
+  const trackedValues = Object.values(subjectXp).filter((value) => value > 0);
+
+  if (!trackedValues.length) {
+    return 0;
+  }
+
+  return Math.round(trackedValues.reduce((sum, value) => sum + value, 0) / trackedValues.length);
 }
 
 function questTitleForAssignment(assignment: Assignment) {

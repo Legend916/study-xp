@@ -84,7 +84,7 @@ function normalizeCurrentAppData(value: unknown): AppData | null {
   const fallback = createEmptyAppData(session);
   const classes = normalizeClasses(value.classes);
   const assignments = normalizeAssignments(value.assignments, classes);
-  const profile = normalizeProfile(value.profile);
+  const profile = normalizeProfile(value.profile, classes);
 
   return {
     session,
@@ -110,7 +110,7 @@ function normalizeLegacyAppData(value: unknown): AppData | null {
   const fallback = createEmptyAppData(session);
   const classes = normalizeClasses(value.classes);
   const assignments = normalizeAssignments(value.assignments, classes);
-  const profile = normalizeLegacyProfile(value.characters);
+  const profile = normalizeLegacyProfile(value.characters, classes);
 
   return {
     session,
@@ -151,7 +151,7 @@ function normalizeSession(value: unknown): SessionState | null {
   };
 }
 
-function normalizeProfile(value: unknown): StudentProfile | null {
+function normalizeProfile(value: unknown, classes: ClassCourse[]): StudentProfile | null {
   if (!isRecord(value)) {
     return null;
   }
@@ -161,7 +161,7 @@ function normalizeProfile(value: unknown): StudentProfile | null {
     return null;
   }
 
-  const base = buildProfile(draft);
+  const base = buildProfile(draft, classes.map((course) => course.subject));
   const subjectXp = normalizeSubjectXp(value.subjectXp, base.subjectXp);
   const totalXp = Math.max(
     toPositiveInteger(value.totalXp, 0),
@@ -184,7 +184,7 @@ function normalizeProfile(value: unknown): StudentProfile | null {
   };
 }
 
-function normalizeLegacyProfile(value: unknown): StudentProfile | null {
+function normalizeLegacyProfile(value: unknown, classes: ClassCourse[]): StudentProfile | null {
   if (!Array.isArray(value) || !value.length) {
     return null;
   }
@@ -204,7 +204,7 @@ function normalizeLegacyProfile(value: unknown): StudentProfile | null {
     return null;
   }
 
-  const base = buildProfile(draft);
+  const base = buildProfile(draft, classes.map((course) => course.subject));
   const subjectXp = normalizeSubjectXp(first.subjectXp, base.subjectXp);
   const totalXp = Math.max(
     toPositiveInteger(first.totalXp, 0),
@@ -272,6 +272,7 @@ function normalizeClass(value: unknown): ClassCourse | null {
     id: toString(value.id) || createId("class"),
     name,
     subject: isSubjectPath(value.subject) ? value.subject : "Math",
+    subjectLabel: toString(value.subjectLabel),
     teacher,
     meetingPattern: toString(value.meetingPattern) || "Weekdays"
   };
@@ -344,7 +345,13 @@ function normalizeStatBlock(value: unknown, fallback: StatBlock) {
 }
 
 function calculateMasteryScore(subjectXp: Record<SubjectPath, number>) {
-  return Math.round(Object.values(subjectXp).reduce((sum, value) => sum + value, 0) / subjectPaths.length);
+  const trackedValues = Object.values(subjectXp).filter((value) => value > 0);
+
+  if (!trackedValues.length) {
+    return 0;
+  }
+
+  return Math.round(trackedValues.reduce((sum, value) => sum + value, 0) / trackedValues.length);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
